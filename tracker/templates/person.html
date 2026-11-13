@@ -1,0 +1,4 @@
+{% extends "base.html" %}{% block content %}<p><a href="{% url 'dashboard' %}?start={{ start|date:'Y-m-d' }}&end={{ end|date:'Y-m-d' }}">Back to dashboard</a></p>
+<h2>{{ u.username }}: {{ total }}h from {{ start }} to {{ end }}</h2>
+{% regroup logs by issue as groups %}{% for g in groups %}<h4><a href="{{ g.grouper.get_absolute_url }}">{{ g.grouper.key }}</a> {{ g.grouper.title }}</h4><table>
+{% for w in g.list %}<tr><td>{{ w.date }}</td><td>{{ w.hours }}h</td><td>{{ w.note }}</td></tr>{% endfor %}</table>{% empty %}<p>No work logged in this range.</p>{% endfor %}{% endblock %}

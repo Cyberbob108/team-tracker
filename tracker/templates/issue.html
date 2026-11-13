@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block content %}
+<p>{% if i.parent %}<a href="{{ i.parent.get_absolute_url }}">{{ i.parent.key }}</a> / {% endif %}<a href="{% url 'project' i.project.key %}">{{ i.project.key }}</a></p>
+<h2>{{ i.key }}: {{ i.title }}</h2>
+<p><small>{{ i.get_type_display }}, {{ i.get_priority_display }} priority. Assignee: {{ i.assignee|default:"Unassigned" }}. Reporter: {{ i.reporter|default:"unknown" }}.{% if i.due_date %} Due {{ i.due_date }}.{% endif %}{% if i.estimate_hours %} Estimate {{ i.estimate_hours }}h.{% endif %}</small></p>
+{% include "_status.html" %}
+<p>{{ i.description|linebreaksbr }}</p>
+<p><a href="{% url 'issue_edit' i.project.key i.number %}">Edit</a>
+{% if user.is_staff %}<form method="post" action="{% url 'issue_delete' i.project.key i.number %}" style="display:inline" onsubmit="return confirm('Delete {{ i.key }} and its sub-issues?')">{% csrf_token %}<button class="outline secondary">Delete</button></form>{% endif %}</p>
+{% if progress is not None %}<p><progress value="{{ progress }}" max="100"></progress> {{ progress }}% of child issues done</p>{% endif %}
+{% if i.type != "subtask" %}<h4>{% if i.type == "epic" %}Stories and tasks{% else %}Sub-tasks{% endif %} <a href="{% url 'issue_new' i.project.key %}?parent={{ i.pk }}">Add</a></h4>
+<ul>{% for c in children %}<li><a href="{{ c.get_absolute_url }}">{{ c.key }}</a> {{ c.title }} <small>{{ c.get_status_display }}, {{ c.assignee|default:"Unassigned" }}</small></li>{% empty %}<li>None yet.</li>{% endfor %}</ul>{% endif %}
+<h4>Work logs: {{ total }}h total, {{ own }}h on this issue</h4>
+<table>{% for w in logs %}<tr><td>{{ w.date }}</td><td>{{ w.user.username }}</td><td>{{ w.hours }}h</td><td>{{ w.note }}</td>
+<td>{% if user.is_staff or w.user_id == user.id %}<a href="{% url 'worklog_edit' w.pk %}">Edit</a>
+<form method="post" action="{% url 'worklog_delete' w.pk %}" style="display:inline" onsubmit="return confirm('Delete this log?')">{% csrf_token %}<button class="outline secondary">Delete</button></form>{% endif %}</td></tr>{% endfor %}</table>
+<form method="post" action="{% url 'worklog_add' i.project.key i.number %}">{% csrf_token %}{{ form.as_p }}<button>Log time</button></form>{% endblock %}

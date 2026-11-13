@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block content %}<h2>Team dashboard</h2>
+<form method="get" class="grid"><input type="date" name="start" value="{{ start|date:'Y-m-d' }}"><input type="date" name="end" value="{{ end|date:'Y-m-d' }}"><button>Apply</button></form>
+<table><thead><tr><th>Person</th><th>Hours logged</th><th>Open</th><th>In progress</th><th>Overdue</th></tr></thead>
+{% for r in rows %}<tr><td><a href="{% url 'person_logs' r.user.pk %}?start={{ start|date:'Y-m-d' }}&end={{ end|date:'Y-m-d' }}">{{ r.user.username }}</a></td><td>{{ r.hours }}</td><td>{{ r.open }}</td><td>{{ r.in_progress }}</td><td>{{ r.overdue }}</td></tr>{% endfor %}</table>
+<h4>Hours by project</h4><table>{% for p in per_project %}<tr><td>{{ p.issue__project__key }}: {{ p.issue__project__name }}</td><td>{{ p.s }}</td></tr>{% empty %}<tr><td>No hours logged in this range.</td></tr>{% endfor %}</table>
+<h4>Unassigned open issues</h4><ul>{% for i in unassigned %}<li><a href="{{ i.get_absolute_url }}">{{ i.key }}</a> {{ i.title }}</li>{% empty %}<li>None.</li>{% endfor %}</ul>{% endblock %}

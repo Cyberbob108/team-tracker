@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Team Tracker{% endblock %}</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.0.6/css/pico.min.css">
+<style>.board{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}@media(max-width:700px){.board{grid-template-columns:1fr}}
+.card{padding:.7rem;margin:0 0 .7rem}.card select,td select{margin:0}small{color:var(--pico-muted-color)}td form{margin:0}</style></head>
+<body><main class="container">
+<nav><ul><li><strong>Team Tracker</strong></li></ul><ul>
+{% if user.is_authenticated %}<li><a href="{% url 'my_work' %}">My work</a></li><li><a href="{% url 'projects' %}">Projects</a></li>
+{% if user.is_staff %}<li><a href="{% url 'dashboard' %}">Dashboard</a></li><li><a href="{% url 'admin:index' %}">Admin</a></li>{% endif %}
+<li><form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="secondary outline">Log out ({{ user.username }})</button></form></li>{% endif %}
+</ul></nav>
+{% for m in messages %}<article>{{ m }}</article>{% endfor %}
+{% block content %}{% endblock %}
+</main></body></html>

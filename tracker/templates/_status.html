@@ -1,0 +1,2 @@
+<form method="post" action="{% url 'issue_status' i.project.key i.number %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}">
+<select name="status" onchange="this.form.submit()" aria-label="Status">{% for c, l in i.STATUS_CHOICES %}<option value="{{ c }}"{% if i.status == c %} selected{% endif %}>{{ l }}</option>{% endfor %}</select></form>

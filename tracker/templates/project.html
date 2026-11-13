@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% block content %}
+<h2>{{ project.key }}: {{ project.name }}</h2>
+<p><a href="{% url 'issue_new' project.key %}" role="button">New issue</a> &nbsp; <a href="?view=board">Board</a> | <a href="?view=list">List</a></p>
+<form method="get"><input type="hidden" name="view" value="{{ view }}"><div class="grid">
+<input name="q" placeholder="Search title" value="{{ request.GET.q }}">
+<select name="type"><option value="">Any type</option>{% for c, l in types %}<option value="{{ c }}"{% if request.GET.type == c %} selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+<select name="status"><option value="">Any status</option>{% for c, l in statuses %}<option value="{{ c }}"{% if request.GET.status == c %} selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+<select name="assignee"><option value="">Anyone</option>{% for u in users %}<option value="{{ u.pk }}"{% if request.GET.assignee == u.pk|stringformat:"s" %} selected{% endif %}>{{ u.username }}</option>{% endfor %}</select>
+<select name="epic"><option value="">All epics</option>{% for e in epics %}<option value="{{ e.pk }}"{% if request.GET.epic == e.pk|stringformat:"s" %} selected{% endif %}>{{ e.key }} {{ e.title }}</option>{% endfor %}</select>
+<button>Filter</button></div></form>
+{% if view == "list" %}
+<table><thead><tr><th>Key</th><th>Type</th><th>Title</th><th>Status</th><th>Assignee</th><th>Due</th></tr></thead>
+{% for i in issues %}<tr><td><a href="{{ i.get_absolute_url }}">{{ i.key }}</a></td><td>{{ i.get_type_display }}</td><td>{{ i.title }}</td><td>{% include "_status.html" %}</td><td>{{ i.assignee|default:"Unassigned" }}</td><td>{{ i.due_date|default:"" }}</td></tr>
+{% empty %}<tr><td colspan="6">No issues match.</td></tr>{% endfor %}</table>
+{% else %}
+<div class="board">{% for code, label, items in cols %}<section><h4>{{ label }} ({{ items|length }})</h4>
+{% for i in items %}<article class="card"><a href="{{ i.get_absolute_url }}">{{ i.key }}</a> <small>{{ i.get_type_display }}</small><br>{{ i.title }}<br><small>{{ i.assignee|default:"Unassigned" }}</small>{% include "_status.html" %}</article>{% endfor %}</section>{% endfor %}</div>
+{% endif %}{% endblock %}

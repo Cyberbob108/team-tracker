@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block content %}<h2>Projects</h2>
+{% if user.is_staff %}<p><a href="{% url 'project_new' %}" role="button">New project</a></p>{% endif %}
+<table><thead><tr><th>Key</th><th>Name</th><th>Open issues</th><th></th></tr></thead>
+{% for p in projects %}<tr><td>{{ p.key }}</td><td><a href="{% url 'project' p.key %}">{{ p.name }}</a>{% if p.is_archived %} <small>(archived)</small>{% endif %}</td><td>{{ p.open_count }}</td>
+<td>{% if user.is_staff %}<a href="{% url 'project_edit' p.key %}">Edit</a>{% endif %}</td></tr>
+{% empty %}<tr><td colspan="4">No projects yet.{% if user.is_staff %} Create the first one.{% endif %}</td></tr>{% endfor %}</table>{% endblock %}
